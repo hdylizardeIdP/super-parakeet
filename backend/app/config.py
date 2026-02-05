@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql://realestate:realestate@localhost:5432/realestate"
+    database_url: str
 
     class Config:
         env_file = ".env"
