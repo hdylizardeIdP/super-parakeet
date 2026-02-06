@@ -1,4 +1,4 @@
-import { Property, PropertyFilters, ContactFormData } from "../types/property";
+import type { Property, PropertyFilters, ContactFormData } from "../types/property";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 

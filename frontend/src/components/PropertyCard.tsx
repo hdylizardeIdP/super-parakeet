@@ -1,4 +1,4 @@
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 
 interface Props {
   property: Property;

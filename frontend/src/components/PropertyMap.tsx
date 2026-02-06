@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 import "leaflet/dist/leaflet.css";
 
 // Fix default marker icon issue with bundlers
