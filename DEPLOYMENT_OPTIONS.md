@@ -202,3 +202,87 @@ Deployment cost and architecture recommendations for the Premier Properties real
 3. **Scale to High** - When response time, uptime SLA, or traffic volume demands it, adopt full cloud-native architecture with HA database, caching, and auto-scaling.
 
 Each tier builds on the previous one. The Docker Compose setup already in this repo is directly deployable to all three tiers with minimal changes -- the main differences are in the surrounding infrastructure (load balancers, managed databases, CDN, monitoring).
+
+---
+
+## PaaS Deployment Guide (Low-Cost Option B)
+
+Step-by-step instructions for deploying Premier Properties on free/low-cost PaaS services.
+
+### Prerequisites
+
+- A GitHub account with this repo pushed to it
+- Free accounts on [Vercel](https://vercel.com), [Railway](https://railway.app), and [Neon](https://neon.tech)
+
+### Step 1: Create the Database (Neon)
+
+1. Sign up at [neon.tech](https://neon.tech) and create a new project.
+2. Name the database `realestate`.
+3. Copy the connection string. It will look like:
+   ```
+   postgresql://user:pass@ep-cool-name-123456.us-east-2.aws.neon.tech/realestate?sslmode=require
+   ```
+4. Neon free tier includes 0.5 GB storage and 100 compute hours/month.
+
+### Step 2: Deploy the Backend (Railway)
+
+1. Sign up at [railway.app](https://railway.app) and click **New Project > Deploy from GitHub Repo**.
+2. Select this repository.
+3. Railway will detect `backend/Dockerfile`. Set the **Root Directory** to `/backend`.
+4. Add these **environment variables** in the Railway dashboard:
+   | Variable | Value |
+   |----------|-------|
+   | `DATABASE_URL` | Your Neon connection string from Step 1 |
+   | `CORS_ORIGINS` | `https://your-app.vercel.app` (update after Step 3) |
+5. Railway exposes a public URL like `https://premier-properties-api.up.railway.app`.
+6. The first deploy will run `seed.py` automatically (it's in the Dockerfile CMD). Subsequent deploys skip seeding because the script is idempotent.
+
+**Alternative -- Render:** Create a new **Web Service**, connect the repo, set Root Directory to `backend`, and set the same environment variables. Render detects the Dockerfile or you can point it to the `Procfile`.
+
+### Step 3: Deploy the Frontend (Vercel)
+
+1. Sign up at [vercel.com](https://vercel.com) and click **Add New > Project**.
+2. Import this GitHub repository.
+3. Set the **Root Directory** to `frontend`.
+4. Vercel auto-detects Vite via `vercel.json`. No build config changes needed.
+5. Add this **environment variable** in the Vercel dashboard:
+   | Variable | Value |
+   |----------|-------|
+   | `VITE_API_URL` | Your Railway backend URL from Step 2 (e.g., `https://premier-properties-api.up.railway.app`) |
+6. Deploy. Vercel gives you a URL like `https://premier-properties.vercel.app`.
+
+### Step 4: Connect the Services
+
+1. Go back to Railway and update the `CORS_ORIGINS` env var with your actual Vercel URL from Step 3.
+2. Redeploy the backend (Railway does this automatically when env vars change).
+3. Visit your Vercel URL -- the app should load and display properties from Neon.
+
+### Step 5: Custom Domain (Optional)
+
+- **Vercel:** Settings > Domains > add your domain. Vercel provisions SSL automatically.
+- **Railway:** Settings > Domains > add a custom domain for the API (e.g., `api.yourdomain.com`).
+- Update `VITE_API_URL` in Vercel to `https://api.yourdomain.com` and `CORS_ORIGINS` in Railway to `https://yourdomain.com`.
+
+### Architecture Diagram
+
+```
+  Browser
+    |
+    ├── https://yourdomain.com ──────> Vercel (static React/Vite build)
+    |                                     |
+    |                                  VITE_API_URL
+    |                                     |
+    └── https://api.yourdomain.com ───> Railway (FastAPI container)
+                                          |
+                                       DATABASE_URL
+                                          |
+                                        Neon (PostgreSQL)
+```
+
+### Files Added for PaaS Deployment
+
+| File | Purpose |
+|------|---------|
+| `frontend/vercel.json` | Tells Vercel to use the Vite framework preset and adds SPA routing rewrites |
+| `backend/Procfile` | Start command for PaaS platforms that don't use Docker (Render, Heroku-compatible) |
+| `backend/.env.example` | Updated with Neon and CORS_ORIGINS examples |
