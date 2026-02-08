@@ -1,5 +1,6 @@
 """Seed the database with sample property listings."""
 
+import os
 from app.database import engine, SessionLocal, Base
 from app.models.property import Property, PropertyType, ListingStatus
 
@@ -308,6 +309,13 @@ PROPERTIES = [
 
 
 def seed():
+    # Only seed if RUN_SEED environment variable is set to "true"
+    run_seed = os.getenv("RUN_SEED", "false").lower() == "true"
+    
+    if not run_seed:
+        print("RUN_SEED not set to 'true'. Skipping database seeding.")
+        return
+    
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
