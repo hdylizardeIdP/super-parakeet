@@ -38,7 +38,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python seed.py                    # seed sample data
+RUN_SEED=true python seed.py   # seed sample data (set RUN_SEED=true)
 uvicorn app.main:app --reload     # start API server on :8000
 ```
 

@@ -235,7 +235,7 @@ Step-by-step instructions for deploying Premier Properties on free/low-cost PaaS
    | `DATABASE_URL` | Your Neon connection string from Step 1 |
    | `CORS_ORIGINS` | `https://your-app.vercel.app` (update after Step 3) |
 5. Railway exposes a public URL like `https://premier-properties-api.up.railway.app`.
-6. The first deploy will run `seed.py` automatically (it's in the Dockerfile CMD). Subsequent deploys skip seeding because the script is idempotent.
+6. **To seed sample data on first deploy**, add `RUN_SEED=true` to environment variables. Remove or set to `false` for production environments to prevent automatic seeding on every restart.
 
 **Alternative -- Render:** Create a new **Web Service**, connect the repo, set Root Directory to `backend`, and set the same environment variables. Render detects the Dockerfile or you can point it to the `Procfile`.
 
@@ -277,6 +277,26 @@ Step-by-step instructions for deploying Premier Properties on free/low-cost PaaS
                                        DATABASE_URL
                                           |
                                         Neon (PostgreSQL)
+```
+
+### Seeding Sample Data
+
+The backend includes a `seed.py` script that loads 15 sample property listings. Seeding is controlled by the `RUN_SEED` environment variable:
+
+**For development or demo environments:**
+- Set `RUN_SEED=true` in your environment variables to enable automatic seeding when the app starts
+- The script is idempotent - it will skip seeding if properties already exist
+
+**For production environments:**
+- Leave `RUN_SEED` unset or set to `false` to prevent automatic seeding
+- This avoids unwanted sample data and potential startup delays/race conditions
+
+**To manually seed a database (one-time):**
+```bash
+# On Railway/Render, run a one-off command:
+RUN_SEED=true python seed.py
+
+# Or temporarily set RUN_SEED=true, deploy, then remove it
 ```
 
 ### Files Added for PaaS Deployment
