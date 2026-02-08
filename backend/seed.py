@@ -309,14 +309,14 @@ PROPERTIES = [
 
 
 def seed():
+    Base.metadata.create_all(bind=engine)
+
     # Only seed if RUN_SEED environment variable is set to "true"
     run_seed = os.getenv("RUN_SEED", "false").lower() == "true"
-    
+
     if not run_seed:
         print("RUN_SEED not set to 'true'. Skipping database seeding.")
         return
-    
-    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         if db.query(Property).count() > 0:
