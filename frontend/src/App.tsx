@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Property, PropertyFilters } from "./types/property";
+import type { Property, PropertyFilters } from "./types/property";
 import { fetchProperties } from "./api/client";
 import FilterBar from "./components/FilterBar";
 import PropertyCard from "./components/PropertyCard";

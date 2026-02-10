@@ -18,7 +18,7 @@ def list_properties(
     state: Optional[str] = Query(None),
     bedrooms: Optional[int] = Query(None),
     property_type: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
+    search: Optional[str] = Query(None, max_length=200),
     db: Session = Depends(get_db),
 ):
     query = db.query(Property)

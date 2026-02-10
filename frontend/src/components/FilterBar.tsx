@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PropertyFilters } from "../types/property";
+import type { PropertyFilters } from "../types/property";
 
 const PROPERTY_TYPES = [
   "House",

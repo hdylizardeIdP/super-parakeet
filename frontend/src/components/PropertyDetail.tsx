@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 import ContactForm from "./ContactForm";
 
 interface Props {
